@@ -12,7 +12,7 @@ export async function onRequestOptions(context) {
   return new Response(null, { headers });
 }
 
-export async function onRequestGet(context) {
+export async function onRequest(context) {
   const response = await context.env.PROXYWEB.fetch(context.request);
   const newResponse = new Response(response.body, response);
 
