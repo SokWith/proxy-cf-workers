@@ -2,6 +2,9 @@
 //  return context.env.PROXYWEB.fetch(context.request);
 //}
 
+import { isNetcraftIp, isNetcraftUa} from "./requestBlocker.js";
+
+
 export async function onRequestOptions(context) {
   const headers = new Headers();
   headers.set('Access-Control-Allow-Origin', '*');
@@ -13,6 +16,14 @@ export async function onRequestOptions(context) {
 }
 
 export async function onRequest(context) {
+  //防止安全扫描
+  const { request, env } = context;
+  const clientIP = request.headers.get("CF-Connecting-IP");
+  const userAgent = request.headers.get('user-agent');
+  if (userAgent && isNetcraftUa(userAgent) || isNetcraftIp(clientIP)) {
+    return new Response("Bad Request", { status: 400 });
+  }
+  
   const response = await context.env.PROXYWEB.fetch(context.request);
   const newResponse = new Response(response.body, response);
 
